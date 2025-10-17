@@ -1,36 +1,43 @@
 Shader "Stencil/MaskWrite"
 {
+    Properties
+    {
+        _ColorA ("Color A", Color) = (1,0,0,1)
+    }
+    
     SubShader
     {
-        Tags { "Queue"="Geometry" "RenderType"="Opaque" }
-        ColorMask 0
-        ZWrite On
-        ZTest LEqual
-
-        Stencil
+        Tags
         {
-            Ref 1
-            Comp Always
-            Pass Replace
-            ReadMask 254
-            WriteMask 254
+            "Queue"="Transparent" "RenderType"="Transparent"
         }
-        
-        HLSLINCLUDE
-        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-        ENDHLSL
+
+//        Stencil
+//        {
+//            Ref 1
+//            WriteMask 255
+//        }
 
         Pass
         {
             HLSLPROGRAM
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
             #pragma vertex vert
             #pragma fragment frag
-            float4 vert(float4 p:POSITION) : SV_Position {
-                
+            
+            float4 vert(float4 p:POSITION) : SV_Position
+            {
                 return TransformObjectToHClip(p);
-
             }
-            float4 frag() : SV_Target { return 0; } // color discarded by ColorMask 0
+
+            float4 _ColorA;
+            // color discarded by ColorMask 0
+            float4 frag() : SV_Target
+            {
+                return _ColorA;
+            }
+            
             ENDHLSL
         }
     }
